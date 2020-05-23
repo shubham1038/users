@@ -1265,7 +1265,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         this.http = http;
         this.baseUrl = "http://localhost:8081/api/";
-        this.baseUserUrl = "https://jsonplaceholder.typicode.com/";
+        this.baseUserUrl = "http://ec2-15-206-159-184.ap-south-1.compute.amazonaws.com/fse-pm-app/api/";
       }
 
       _createClass(StudentService, [{
@@ -1273,33 +1273,33 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         value: function getUserList() {
           var _this2 = this;
 
-          return this.http.get("".concat(this.baseUserUrl) + "users").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(0), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["timeout"])(2000), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(function (err) {
+          return this.http.get("".concat(this.baseUserUrl) + "user-list").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(0), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["timeout"])(2000), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(function (err) {
             return _this2.http.get('assets/data/users.json'); //return throwError(err.message || 'Server Error');
           }));
         }
       }, {
         key: "getStudentList",
         value: function getStudentList() {
-          return this.http.get("".concat(this.baseUrl) + "students-list").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(5), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(function (err) {
+          return this.http.get("".concat(this.baseUserUrl) + "user-list").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(5), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(function (err) {
             return Object(rxjs__WEBPACK_IMPORTED_MODULE_2__["throwError"])(err.message || 'Server Error');
           }));
         }
       }, {
         key: "createStudent",
         value: function createStudent(student) {
-          return this.http.post("".concat(this.baseUrl) + 'save-student', student);
+          return this.http.post("".concat(this.baseUserUrl) + 'save-user', student);
         }
       }, {
         key: "deleteStudent",
         value: function deleteStudent(id) {
-          return this.http["delete"]("".concat(this.baseUrl) + 'delete-student/' + "".concat(id), {
+          return this.http["delete"]("".concat(this.baseUserUrl) + 'delete-user/' + "".concat(id), {
             responseType: 'text'
           });
         }
       }, {
         key: "getUser",
         value: function getUser(id) {
-          return this.http.get("".concat(this.baseUserUrl) + 'users/' + "".concat(id)).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(1), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(this.errorHandler));
+          return this.http.get("".concat(this.baseUserUrl) + 'user/' + "".concat(id)).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(1), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(this.errorHandler));
         }
         /*getStudent(id: number): Observable<any> {
           return this.http.get<Student>(`${this.baseUrl}` + 'student/' + `${id}`)
@@ -1309,15 +1309,14 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             )
         }*/
 
-        /*updateStudent(id: number, value: any): Observable<Object> {
-          return this.http.post(`${this.baseUrl}/update-student/${id}`, value);
-        }*/
-
       }, {
         key: "updateStudent",
         value: function updateStudent(id, value) {
-          return this.http.post("".concat(this.baseUserUrl, "users/").concat(id), value);
-        }
+          return this.http.post("".concat(this.baseUserUrl, "/update-user/").concat(id), value);
+        } // updateStudent(id: number, value: User): Observable<Object> {
+        //   return this.http.post(`${this.baseUserUrl}users/${id}`, value);
+        // }
+
       }, {
         key: "getAllPostCall",
         value: function getAllPostCall() {
@@ -1339,7 +1338,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         key: "getUsers",
         value: function getUsers() {
           //https://jsonplaceholder.typicode.com/users --Replace with JSON as open api is not working sometimes
-          return this.http.get('assets/data/users.json').toPromise();
+          return this.getUserList().toPromise();
         } //`https://jsonplaceholder.typicode.com/posts?userId=${userId}`
 
       }, {
@@ -2070,7 +2069,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }
 
     var StudentListComponent = /*#__PURE__*/function () {
-      // @ViewChild(StudentListChildComponent) childComponentRef : StudentListChildComponent;
       function StudentListComponent(studentservice, inreractionService, route, spinner, modalService) {
         _classCallCheck(this, StudentListComponent);
 
@@ -2084,8 +2082,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         this.user = new _core_model_user__WEBPACK_IMPORTED_MODULE_3__["User"]();
         this.addedUser = new _core_model_user__WEBPACK_IMPORTED_MODULE_3__["User"]();
         this.student = new _core_model_student__WEBPACK_IMPORTED_MODULE_1__["Student"]();
-        this.isupdatedMess = true; //public parentData ='I am Sending data from Parent Componet';
-
+        this.isupdatedMess = true;
         this.parentDataUsingGetterSetter = 'I am Sending data from Parent Componet Using Getter Setter';
         this.isErrorMessage = false;
         this.headerVal = 'User Information';
@@ -2098,22 +2095,12 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
       _createClass(StudentListComponent, [{
         key: "ngAfterViewInit",
-        value: function ngAfterViewInit() {//this.childComponentRef.message ='Message from Parent Component';
-        }
+        value: function ngAfterViewInit() {}
       }, {
         key: "moveNext",
         value: function moveNext() {
           this.route.navigate(['/student/student-details']);
-        } // clickToHello(){
-        //   this.inreractionService.sentMessage('Good Morning Child')
-        // }
-        // clickToThanks(){
-        //   this.inreractionService.sentMessage('Thanks Child')
-        // }
-        // clickToChild(){
-        //   this.childComponentRef.message = 'Message from Parent Component';
-        // }
-
+        }
       }, {
         key: "ngOnInit",
         value: function ngOnInit() {
@@ -2125,61 +2112,56 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
             _this3.addedUser = user;
             console.log(_this3.addedUser);
           });
-          this.studentservice.getUserList().subscribe(function (data) {
-            // console.log(this.inreractionService._user);
-            /// if(this.addedUser)
-            //if (isEmpty(this.addedUser))
-            if (_this3.inreractionService._user) {
-              data.length;
-              _this3.inreractionService._user.id = data.length + 1;
-              data.push(_this3.inreractionService._user); // console.log(data1);
-            }
-
+          this.studentservice.getStudentList().subscribe(function (data) {
             _this3.userList = data;
-
-            _this3.spinner.hide();
-          }, function (error) {
-            _this3.errorMsg = error;
+          }, function (err) {
+            _this3.errorMsg = err;
             _this3.isErrorMessage = true;
-          });
-          /*this.studentservice.getStudentList()
-            .subscribe(
-              data => {
-                this.studentList = data;
-              },
-              err => {
-                this.errorMsg = err;
-                this.isErrorMessage = true;
+
+            _this3.studentservice.getUserList().subscribe(function (data) {
+              if (_this3.inreractionService._user) {
+                data.length;
+                _this3.inreractionService._user.id = data.length + 1;
+                data.push(_this3.inreractionService._user);
               }
-            )*/
+
+              _this3.userList = data;
+
+              _this3.spinner.hide();
+            }, function (error) {
+              _this3.errorMsg = error;
+              _this3.isErrorMessage = true;
+            });
+          });
         }
       }, {
         key: "deleteStudent",
         value: function deleteStudent(id) {
           var _this4 = this;
 
-          this.studentservice.getUserList().subscribe(function (data) {
-            _this4.userList = data.filter(function (x) {
-              return x.id != id;
+          this.studentservice.deleteStudent(id).subscribe(function (data) {
+            console.log(data);
+
+            _this4.studentservice.getStudentList().subscribe(function (data) {
+              _this4.deleteMessage = true;
+              console.log(data);
+              _this4.userList = data;
+
+              _this4.modalService.confirmOK('User Data Deleted', function () {}, "Success");
             });
-            _this4.deleteMessage = true;
+          }, function (error) {
+            console.log(error);
 
-            _this4.modalService.confirmOK('User Data Deleted', function () {}, "Success"); //this.userList = data;
+            _this4.studentservice.getUserList().subscribe(function (data) {
+              _this4.userList = data.filter(function (x) {
+                return x.id != id;
+              });
+              _this4.deleteMessage = true;
 
+              _this4.modalService.confirmOK('User Data Deleted', function () {}, "Success"); //this.userList = data;
+
+            });
           });
-          /* this.studentservice.deleteStudent(id).subscribe(data => {
-             console.log(data)
-             this.studentservice.getStudentList().subscribe(
-               data => {
-                 this.deleteMessage = true;
-                 console.log(data)
-                 this.studentList = data;
-               }
-             )
-           },
-             error => { console.log(error)
-             }
-           )*/
         }
       }, {
         key: "updateStudent",
@@ -2188,7 +2170,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
           this.studentservice.getUser(id).subscribe(function (data) {
             _this5.isupdated = true;
-            _this5.user = data;
+            _this5.user = data[0];
           }, function (error) {
             return console.log(error.message);
           });
@@ -2204,29 +2186,44 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           this.user.email = this.StudentEmail.value; // this.student.student_branch=this.StudentBranch.value;  
           // console.log(this.StudentBranch.value);
 
-          this.studentservice.getUserList().subscribe(function (data) {
-            _this6.userList = data.map(function (user) {
-              if (user.id === _this6.user.id) {
-                user.name = _this6.user.name;
-                user.email = _this6.user.email;
-                return user;
-              } else {
-                return user;
-              }
+          this.studentservice.updateStudent(this.user.id, this.user).subscribe(function (data) {
+            _this6.isupdated = true;
+
+            _this6.studentservice.getStudentList().subscribe(function (data) {
+              _this6.isupdatedMess = false;
+              _this6.userList = data;
             });
           }, function (error) {
-            return console.log(error);
+            console.log(error);
+
+            _this6.studentservice.getUserList().subscribe(function (data) {
+              _this6.userList = data.map(function (user) {
+                if (user.id === _this6.user.id) {
+                  user.name = _this6.user.name;
+                  user.email = _this6.user.email;
+                  return user;
+                } else {
+                  return user;
+                }
+              });
+            }, function (error) {
+              return console.log(error);
+            });
           });
-          /*this.studentservice.updateStudent(this.user.id,this.user).subscribe(
-           data => {
-             this.isupdated=true;
-             this.studentservice.getStudentList().subscribe(data =>{
-               this.isupdatedMess = false;
-               this.studentList =data
-               })
-           },
-           error => console.log(error)); */
         }
+      }, {
+        key: "changeisUpdate",
+        value: function changeisUpdate() {
+          this.isupdated = false;
+        }
+      }, {
+        key: "hideError",
+        value: function hideError() {
+          this.isErrorMessage = false;
+        }
+      }, {
+        key: "StudentName",
+
         /* updateStu(updstu : any){
              this.student=new Student();
             this.student.student_id=this.StudentId.value;
@@ -2244,22 +2241,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
              },
              error => console.log(error));
          }*/
-
-      }, {
-        key: "changeisUpdate",
-        value: function changeisUpdate() {
-          this.isupdated = false;
-        } // clickParentMethod(message :string){
-        //   alert('HiHihhi' + message);
-        // }
-
-      }, {
-        key: "hideError",
-        value: function hideError() {
-          this.isErrorMessage = false;
-        }
-      }, {
-        key: "StudentName",
         get: function get() {
           return this.studentupdateform.get('name');
         }
@@ -2268,10 +2249,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         get: function get() {
           return this.studentupdateform.get('email');
         }
-        /*get StudentBranch(){
-          return this.studentupdateform.get('student_branch');
-        }  */
-
       }, {
         key: "StudentId",
         get: function get() {

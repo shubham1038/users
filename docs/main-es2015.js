@@ -680,27 +680,27 @@ class StudentService {
     constructor(http) {
         this.http = http;
         this.baseUrl = "http://localhost:8081/api/";
-        this.baseUserUrl = "https://jsonplaceholder.typicode.com/";
+        this.baseUserUrl = "http://ec2-15-206-159-184.ap-south-1.compute.amazonaws.com/fse-pm-app/api/";
     }
     getUserList() {
-        return this.http.get(`${this.baseUserUrl}` + "users").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(0), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["timeout"])(2000), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(err => {
+        return this.http.get(`${this.baseUserUrl}` + "user-list").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(0), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["timeout"])(2000), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(err => {
             return this.http.get('assets/data/users.json');
             //return throwError(err.message || 'Server Error');
         }));
     }
     getStudentList() {
-        return this.http.get(`${this.baseUrl}` + "students-list").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(5), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(err => {
+        return this.http.get(`${this.baseUserUrl}` + "user-list").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(5), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(err => {
             return Object(rxjs__WEBPACK_IMPORTED_MODULE_2__["throwError"])(err.message || 'Server Error');
         }));
     }
     createStudent(student) {
-        return this.http.post(`${this.baseUrl}` + 'save-student', student);
+        return this.http.post(`${this.baseUserUrl}` + 'save-user', student);
     }
     deleteStudent(id) {
-        return this.http.delete(`${this.baseUrl}` + 'delete-student/' + `${id}`, { responseType: 'text' });
+        return this.http.delete(`${this.baseUserUrl}` + 'delete-user/' + `${id}`, { responseType: 'text' });
     }
     getUser(id) {
-        return this.http.get(`${this.baseUserUrl}` + 'users/' + `${id}`)
+        return this.http.get(`${this.baseUserUrl}` + 'user/' + `${id}`)
             .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(1), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(this.errorHandler));
     }
     /*getStudent(id: number): Observable<any> {
@@ -710,12 +710,12 @@ class StudentService {
           catchError(this.errorHandler)
         )
     }*/
-    /*updateStudent(id: number, value: any): Observable<Object> {
-      return this.http.post(`${this.baseUrl}/update-student/${id}`, value);
-    }*/
     updateStudent(id, value) {
-        return this.http.post(`${this.baseUserUrl}users/${id}`, value);
+        return this.http.post(`${this.baseUserUrl}/update-user/${id}`, value);
     }
+    // updateStudent(id: number, value: User): Observable<Object> {
+    //   return this.http.post(`${this.baseUserUrl}users/${id}`, value);
+    // }
     getAllPostCall() {
         return this.http.get('https://jsonplaceholder.typicode.com/todos/1');
     }
@@ -729,7 +729,7 @@ class StudentService {
     }
     getUsers() {
         //https://jsonplaceholder.typicode.com/users --Replace with JSON as open api is not working sometimes
-        return this.http.get('assets/data/users.json')
+        return this.getUserList()
             .toPromise();
     }
     //`https://jsonplaceholder.typicode.com/posts?userId=${userId}`
@@ -1075,7 +1075,6 @@ function StudentListComponent_tr_31_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtextInterpolate"](student_r2.email);
 } }
 class StudentListComponent {
-    // @ViewChild(StudentListChildComponent) childComponentRef : StudentListChildComponent;
     constructor(studentservice, inreractionService, route, spinner, modalService) {
         this.studentservice = studentservice;
         this.inreractionService = inreractionService;
@@ -1088,7 +1087,6 @@ class StudentListComponent {
         this.addedUser = new _core_model_user__WEBPACK_IMPORTED_MODULE_3__["User"]();
         this.student = new _core_model_student__WEBPACK_IMPORTED_MODULE_1__["Student"]();
         this.isupdatedMess = true;
-        //public parentData ='I am Sending data from Parent Componet';
         this.parentDataUsingGetterSetter = 'I am Sending data from Parent Componet Using Getter Setter';
         this.isErrorMessage = false;
         this.headerVal = 'User Information';
@@ -1099,20 +1097,10 @@ class StudentListComponent {
         });
     }
     ngAfterViewInit() {
-        //this.childComponentRef.message ='Message from Parent Component';
     }
     moveNext() {
         this.route.navigate(['/student/student-details']);
     }
-    // clickToHello(){
-    //   this.inreractionService.sentMessage('Good Morning Child')
-    // }
-    // clickToThanks(){
-    //   this.inreractionService.sentMessage('Thanks Child')
-    // }
-    // clickToChild(){
-    //   this.childComponentRef.message = 'Message from Parent Component';
-    // }
     ngOnInit() {
         this.isupdated = false;
         this.spinner.show();
@@ -1120,60 +1108,51 @@ class StudentListComponent {
             this.addedUser = user;
             console.log(this.addedUser);
         });
-        this.studentservice.getUserList()
+        this.studentservice.getStudentList()
             .subscribe(data => {
-            // console.log(this.inreractionService._user);
-            /// if(this.addedUser)
-            //if (isEmpty(this.addedUser))
-            if (this.inreractionService._user) {
-                data.length;
-                this.inreractionService._user.id = data.length + 1;
-                data.push(this.inreractionService._user);
-                // console.log(data1);
-            }
             this.userList = data;
-            this.spinner.hide();
-        }, error => {
-            this.errorMsg = error;
+        }, err => {
+            this.errorMsg = err;
             this.isErrorMessage = true;
+            this.studentservice.getUserList()
+                .subscribe(data => {
+                if (this.inreractionService._user) {
+                    data.length;
+                    this.inreractionService._user.id = data.length + 1;
+                    data.push(this.inreractionService._user);
+                }
+                this.userList = data;
+                this.spinner.hide();
+            }, error => {
+                this.errorMsg = error;
+                this.isErrorMessage = true;
+            });
         });
-        /*this.studentservice.getStudentList()
-          .subscribe(
-            data => {
-              this.studentList = data;
-            },
-            err => {
-              this.errorMsg = err;
-              this.isErrorMessage = true;
-            }
-          )*/
     }
     deleteStudent(id) {
-        this.studentservice.getUserList()
-            .subscribe(data => {
-            this.userList = data.filter(x => x.id != id);
-            this.deleteMessage = true;
-            this.modalService.confirmOK('User Data Deleted', () => { }, "Success");
-            //this.userList = data;
+        this.studentservice.deleteStudent(id).subscribe(data => {
+            console.log(data);
+            this.studentservice.getStudentList().subscribe(data => {
+                this.deleteMessage = true;
+                console.log(data);
+                this.userList = data;
+                this.modalService.confirmOK('User Data Deleted', () => { }, "Success");
+            });
+        }, error => {
+            console.log(error);
+            this.studentservice.getUserList()
+                .subscribe(data => {
+                this.userList = data.filter(x => x.id != id);
+                this.deleteMessage = true;
+                this.modalService.confirmOK('User Data Deleted', () => { }, "Success");
+                //this.userList = data;
+            });
         });
-        /* this.studentservice.deleteStudent(id).subscribe(data => {
-           console.log(data)
-           this.studentservice.getStudentList().subscribe(
-             data => {
-               this.deleteMessage = true;
-               console.log(data)
-               this.studentList = data;
-             }
-           )
-         },
-           error => { console.log(error)
-           }
-         )*/
     }
     updateStudent(id) {
         this.studentservice.getUser(id).subscribe(data => {
             this.isupdated = true;
-            this.user = data;
+            this.user = data[0];
         }, error => console.log(error.message));
     }
     updateStu(updstu) {
@@ -1183,28 +1162,29 @@ class StudentListComponent {
         this.user.email = this.StudentEmail.value;
         // this.student.student_branch=this.StudentBranch.value;  
         // console.log(this.StudentBranch.value);
-        this.studentservice.getUserList().subscribe(data => {
-            this.userList = data.map(user => {
-                if (user.id === this.user.id) {
-                    user.name = this.user.name;
-                    user.email = this.user.email;
-                    return user;
-                }
-                else {
-                    return user;
-                }
+        this.studentservice.updateStudent(this.user.id, this.user).subscribe(data => {
+            this.isupdated = true;
+            this.studentservice.getStudentList().subscribe(data => {
+                this.isupdatedMess = false;
+                this.userList = data;
             });
-        }, error => console.log(error));
-        /*this.studentservice.updateStudent(this.user.id,this.user).subscribe(
-         data => {
-           this.isupdated=true;
-           this.studentservice.getStudentList().subscribe(data =>{
-             this.isupdatedMess = false;
-             this.studentList =data
-             })
-         },
-         error => console.log(error)); */
+        }, error => {
+            console.log(error);
+            this.studentservice.getUserList().subscribe(data => {
+                this.userList = data.map(user => {
+                    if (user.id === this.user.id) {
+                        user.name = this.user.name;
+                        user.email = this.user.email;
+                        return user;
+                    }
+                    else {
+                        return user;
+                    }
+                });
+            }, error => console.log(error));
+        });
     }
+    ;
     /* updateStu(updstu : any){
          this.student=new Student();
         this.student.student_id=this.StudentId.value;
@@ -1228,18 +1208,12 @@ class StudentListComponent {
     get StudentEmail() {
         return this.studentupdateform.get('email');
     }
-    /*get StudentBranch(){
-      return this.studentupdateform.get('student_branch');
-    }  */
     get StudentId() {
         return this.studentupdateform.get('id');
     }
     changeisUpdate() {
         this.isupdated = false;
     }
-    // clickParentMethod(message :string){
-    //   alert('HiHihhi' + message);
-    // }
     hideError() {
         this.isErrorMessage = false;
     }
