@@ -680,7 +680,8 @@ class StudentService {
     constructor(http) {
         this.http = http;
         this.baseUrl = "http://localhost:8081/api/";
-        this.baseUserUrl = "http://ec2-15-206-159-184.ap-south-1.compute.amazonaws.com/fse-pm-app/api/";
+        //private baseUserUrl = "http://ec2-15-206-159-184.ap-south-1.compute.amazonaws.com/fse-pm-app/api/";
+        this.baseUserUrl = "https://shubhtech1038.xyz/fse-pm-app/api/";
     }
     getUserList() {
         return this.http.get(`${this.baseUserUrl}` + "user-list").pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["retry"])(0), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["timeout"])(2000), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(err => {

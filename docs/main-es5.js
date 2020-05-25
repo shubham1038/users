@@ -1264,8 +1264,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         _classCallCheck(this, StudentService);
 
         this.http = http;
-        this.baseUrl = "http://localhost:8081/api/";
-        this.baseUserUrl = "http://ec2-15-206-159-184.ap-south-1.compute.amazonaws.com/fse-pm-app/api/";
+        this.baseUrl = "http://localhost:8081/api/"; //private baseUserUrl = "http://ec2-15-206-159-184.ap-south-1.compute.amazonaws.com/fse-pm-app/api/";
+
+        this.baseUserUrl = "https://shubhtech1038.xyz/fse-pm-app/api/";
       }
 
       _createClass(StudentService, [{
